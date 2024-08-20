@@ -76,7 +76,7 @@ impl Sandbox for Wish {
     }
 }
 
-fn items_list_view(items: &Vec<String>) -> Element<'static, Message> {
+fn items_list_view(items: &[String]) -> Element<'static, Message> {
     let mut column = Column::new()
         .spacing(20)
         .align_items(iced::Alignment::Center)
