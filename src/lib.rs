@@ -1,6 +1,6 @@
 use iced::{
     alignment,
-    widget::{button, column, container, row, scrollable, text, text_input, Column},
+    widget::{button, column, container, row, scrollable, svg, text, text_input, Column},
     Element, Length, Padding, Sandbox, Theme,
 };
 
@@ -33,7 +33,7 @@ impl Sandbox for Wish {
     }
 
     fn title(&self) -> String {
-        "A cool application".into()
+        "Wish probability calculator".into()
     }
 
     fn update(&mut self, message: Self::Message) {
@@ -50,9 +50,17 @@ impl Sandbox for Wish {
     }
 
     fn view(&self) -> Element<Self::Message> {
+        let handle =
+            svg::Handle::from_memory(include_bytes!("../resources/chiori_doll.svg").as_slice());
+
+        let svg: svg::Svg<Theme> = svg(handle)
+            .width(Length::FillPortion(3))
+            .height(Length::FillPortion(3));
+
         container(
             column!(
                 items_list_view(&self.items),
+                svg,
                 row!(
                     text_input("Input resource", &self.input_value)
                         .on_input(|value| Message::InputValue(value.to_lowercase()))
