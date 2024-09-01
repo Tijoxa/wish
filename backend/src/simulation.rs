@@ -3,7 +3,7 @@ use rand::prelude::*;
 use crate::constant::{X, Y};
 
 #[allow(clippy::too_many_arguments)]
-pub fn simul(
+pub fn simulate(
     input_pulls: u32,
     input_pity_character: usize,
     input_capture_radiance: u32,

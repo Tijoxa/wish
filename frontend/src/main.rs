@@ -1,11 +1,11 @@
+use frontend::index::Index;
 use iced::{
     window::{self, icon},
     Application, Settings, Size,
 };
-use wish::index::Index;
 
 fn main() -> iced::Result {
-    let icon = icon::from_file_data(include_bytes!("../resources/genesis_crystal.png"), None)
+    let icon = icon::from_file_data(include_bytes!("../../resources/genesis_crystal.png"), None)
         .expect("Failed to create icon");
     let settings = Settings {
         window: window::Settings {
