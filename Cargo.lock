@@ -868,17 +868,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aa9a19cbb55df58761df49b23516a86d432839add4af60fc256da840f66ed35b"
 
 [[package]]
-name = "frontend"
-version = "0.1.0"
-dependencies = [
- "backend",
- "iced",
- "resvg 0.43.0",
- "tiny-skia",
- "usvg 0.43.0",
-]
-
-[[package]]
 name = "futures"
 version = "0.3.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3856,6 +3845,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68a9bda4691f099d435ad181000724da8e5899daa10713c2d432552b9ccd3a6f"
 dependencies = [
  "memchr",
+]
+
+[[package]]
+name = "wish"
+version = "0.1.0"
+dependencies = [
+ "backend",
+ "iced",
+ "resvg 0.43.0",
+ "tiny-skia",
+ "usvg 0.43.0",
 ]
 
 [[package]]
