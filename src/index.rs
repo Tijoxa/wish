@@ -1,11 +1,8 @@
 use backend::simulate_n;
 use iced::{
-    alignment,
-    widget::{
-        button, checkbox, column, container, row, scrollable, slider, svg, text, text_input,
-        Column, Space,
-    },
-    Element, Length, Padding, Sandbox, Theme,
+    alignment, font,
+    widget::{button, checkbox, column, container, row, slider, svg, text, text_input},
+    Element, Font, Length, Renderer, Sandbox, Theme,
 };
 
 pub struct Index {
@@ -71,7 +68,7 @@ impl Sandbox for Index {
     }
 
     fn title(&self) -> String {
-        "index".into()
+        String::from("Wish Planner")
     }
 
     fn update(&mut self, message: Self::Message) {
@@ -111,93 +108,135 @@ impl Sandbox for Index {
     }
 
     fn view(&self) -> Element<Self::Message> {
-        container(column!(
-            row!(
-                text("nb pulls: "),
-                slider(0..=1000, self.input_pulls, Message::PullsChanged),
-                text(format!(" Current value: {}", self.input_pulls)),
-            ),
-            column!(
-                text("\n=== CHARACTER ==="),
-                text(""),
-                row!(
-                    text("pity character: "),
-                    slider(
-                        0..=89,
-                        self.input_pity_character as u32,
-                        Message::PityCharacterChanged
-                    ),
-                    text(format!(" Current value: {}", self.input_pity_character)),
+        let handle =
+            svg::Handle::from_memory(include_bytes!("../resources/chiori_doll.svg").as_slice());
+        let container_title: container::Container<'_, Message, Theme, Renderer> = container(row!(
+            svg(handle.clone())
+                .width(Length::Fixed(60.0))
+                .height(Length::Fixed(60.0)),
+            text("Wish Planner")
+                .font(Font {
+                    weight: font::Weight::ExtraBold,
+                    ..Default::default()
+                })
+                .size(40),
+            svg(handle.clone())
+                .width(Length::Fixed(60.0))
+                .height(Length::Fixed(60.0)),
+        ));
+
+        let container_top: container::Container<'_, Message, Theme, Renderer> = container(column!(
+            text(format!("Available wishes: {}", self.input_pulls)),
+            slider(0..=1000, self.input_pulls, Message::PullsChanged),
+        ));
+
+        let container_left: container::Container<'_, Message, Theme, Renderer> =
+            container(column!(
+                container(text("=== CHARACTER ===").font(Font {
+                    weight: font::Weight::Bold,
+                    ..Default::default()
+                }))
+                .padding(5),
+                text(format!(
+                    "Current character banner pity: {}",
+                    self.input_pity_character
+                )),
+                slider(
+                    0..=89,
+                    self.input_pity_character as u32,
+                    Message::PityCharacterChanged
                 ),
-                row!(
-                    text("capture radiance: "),
-                    slider(
-                        1..=4,
-                        self.input_capture_radiance,
-                        Message::CaptureRadianceChanged
-                    ),
-                    text(format!(" Current value: {}", self.input_capture_radiance)),
+                text(format!(
+                    "Current capturing radiance: {}",
+                    self.input_capture_radiance
+                )),
+                slider(
+                    1..=4,
+                    self.input_capture_radiance,
+                    Message::CaptureRadianceChanged
                 ),
-                row!(checkbox("garanteed character", self.input_focus_character)
-                    .on_toggle(Message::FocusCharacterChanged)),
-                text("\n=== WEAPON ==="),
-                text(""),
-                row!(
-                    text("pity weapon: "),
-                    slider(
-                        0..=76,
-                        self.input_pity_weapon as u32,
-                        Message::PityWeaponChanged
-                    ),
-                    text(format!(" Current value: {}", self.input_pity_weapon)),
+                checkbox("Garanteed character", self.input_focus_character)
+                    .on_toggle(Message::FocusCharacterChanged),
+                container(text("=== WEAPON ===").font(Font {
+                    weight: font::Weight::Bold,
+                    ..Default::default()
+                }))
+                .padding(5),
+                text(format!(
+                    "Current weapon banner pity: {}",
+                    self.input_pity_weapon
+                )),
+                slider(
+                    0..=76,
+                    self.input_pity_weapon as u32,
+                    Message::PityWeaponChanged
                 ),
-                row!(checkbox("epitomized path", self.input_epitomized_path)
-                    .on_toggle(Message::EpitomizedPathChanged)),
-                row!(checkbox("garanteed focus weapon", self.input_focus_weapon)
-                    .on_toggle(Message::FocusWeaponChanged)),
-            ),
-            column!(
-                // vertical line
-            ),
-            column!(
-                text("Current constellation"),
+                checkbox("Epitomized path", self.input_epitomized_path)
+                    .on_toggle(Message::EpitomizedPathChanged),
+                checkbox("Garanteed focus weapon", self.input_focus_weapon)
+                    .on_toggle(Message::FocusWeaponChanged),
+            ));
+
+        let container_right: container::Container<'_, Message, Theme, Renderer> =
+            container(column!(
+                text(match self.input_constellation {
+                    -1 => "Current constellation: None".to_string(),
+                    _ => {
+                        format!("Current constellation: {}", self.input_constellation)
+                    }
+                }),
                 slider(
                     -1..=6,
                     self.input_constellation,
                     Message::CurrentConstellationChanged
                 ),
-                text("Current refinement"),
+                text(format!("Current refinement: {}", self.input_refinement)),
                 slider(
                     0..=5,
                     self.input_refinement,
                     Message::CurrentRefinementChanged
                 ),
-                text("Wanted constellation"),
+                text(match self.wanted_constellation {
+                    -1 => "Wanted constellation: None".to_string(),
+                    _ => {
+                        format!("Wanted constellation: {}", self.wanted_constellation)
+                    }
+                }),
                 slider(
                     -1..=6,
                     self.wanted_constellation,
                     Message::WantedConstellationChanged
                 ),
-                text("Wanted refinement"),
+                text(format!("Wanted refinement: {}", self.wanted_refinement)),
                 slider(
                     0..=5,
                     self.wanted_refinement,
                     Message::WantedRefinementChanged
                 ),
-            ),
-            row!(
+            ));
+
+        let container_bottom: container::Container<'_, Message, Theme, Renderer> =
+            container(column!(
                 button("Submit").on_press(Message::Simulate),
                 text(format!(
                     "Estimated probability: {}",
                     self.estimated_probability
                 ))
-            )
-        ))
-        .height(Length::Fill)
-        .width(Length::Fill)
-        .align_x(alignment::Horizontal::Center)
-        .align_y(alignment::Vertical::Center)
-        .into()
+                .size(20)
+                .font(Font {
+                    weight: font::Weight::Semibold,
+                    ..Default::default()
+                })
+            ));
+
+        let content = column!(
+            container_title.padding(5),
+            container_top.padding(5),
+            container(row!(container_left.padding(5), container_right.padding(5))),
+            container_bottom.padding(5)
+        );
+
+        container(content).padding(20).into()
     }
 
     fn theme(&self) -> Theme {
