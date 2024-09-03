@@ -1,3 +1,5 @@
+#![windows_subsystem = "windows"]
+
 use iced::{
     window::{self, icon},
     Application, Settings, Size,
