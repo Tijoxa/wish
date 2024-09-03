@@ -114,20 +114,23 @@ impl Sandbox for Index {
             svg(handle.clone())
                 .width(Length::Fixed(60.0))
                 .height(Length::Fixed(60.0)),
-            text("Wish Planner")
-                .font(Font {
-                    weight: font::Weight::ExtraBold,
-                    ..Default::default()
-                })
-                .size(40),
+            container(
+                text("Wish Planner")
+                    .font(Font {
+                        weight: font::Weight::ExtraBold,
+                        ..Default::default()
+                    })
+                    .size(40)
+            )
+            .padding(5),
             svg(handle.clone())
                 .width(Length::Fixed(60.0))
                 .height(Length::Fixed(60.0)),
         ));
 
         let container_top: container::Container<'_, Message, Theme, Renderer> = container(column!(
-            text(format!("Available wishes: {}", self.input_pulls)),
-            slider(0..=1000, self.input_pulls, Message::PullsChanged),
+            container(text(format!("Available wishes: {}", self.input_pulls))).padding(5),
+            container(slider(0..=1000, self.input_pulls, Message::PullsChanged)).padding(5),
         ));
 
         let container_left: container::Container<'_, Message, Theme, Renderer> =
@@ -136,88 +139,117 @@ impl Sandbox for Index {
                     weight: font::Weight::Bold,
                     ..Default::default()
                 }))
-                .padding(5),
-                text(format!(
+                .padding(7),
+                container(text(format!(
                     "Current character banner pity: {}",
                     self.input_pity_character
-                )),
-                slider(
+                )))
+                .padding(5),
+                container(slider(
                     0..=89,
                     self.input_pity_character as u32,
                     Message::PityCharacterChanged
-                ),
-                text(format!(
+                ))
+                .padding(5),
+                container(text(format!(
                     "Current capturing radiance: {}",
                     self.input_capture_radiance
-                )),
-                slider(
+                )))
+                .padding(5),
+                container(slider(
                     1..=4,
                     self.input_capture_radiance,
                     Message::CaptureRadianceChanged
-                ),
-                checkbox("Garanteed character", self.input_focus_character)
-                    .on_toggle(Message::FocusCharacterChanged),
+                ))
+                .padding(5),
+                container(
+                    checkbox("Garanteed character", self.input_focus_character)
+                        .on_toggle(Message::FocusCharacterChanged)
+                )
+                .padding(5),
                 container(text("=== WEAPON ===").font(Font {
                     weight: font::Weight::Bold,
                     ..Default::default()
                 }))
-                .padding(5),
-                text(format!(
+                .padding(7),
+                container(text(format!(
                     "Current weapon banner pity: {}",
                     self.input_pity_weapon
-                )),
-                slider(
+                )))
+                .padding(5),
+                container(slider(
                     0..=76,
                     self.input_pity_weapon as u32,
                     Message::PityWeaponChanged
-                ),
-                checkbox("Epitomized path", self.input_epitomized_path)
-                    .on_toggle(Message::EpitomizedPathChanged),
-                checkbox("Garanteed focus weapon", self.input_focus_weapon)
-                    .on_toggle(Message::FocusWeaponChanged),
+                ))
+                .padding(5),
+                container(
+                    checkbox("Epitomized path", self.input_epitomized_path)
+                        .on_toggle(Message::EpitomizedPathChanged)
+                )
+                .padding(5),
+                container(
+                    checkbox("Garanteed focus weapon", self.input_focus_weapon)
+                        .on_toggle(Message::FocusWeaponChanged)
+                )
+                .padding(5),
             ));
 
         let container_right: container::Container<'_, Message, Theme, Renderer> =
             container(column!(
-                text(match self.input_constellation {
+                container(text(match self.input_constellation {
                     -1 => "Current constellation: None".to_string(),
                     _ => {
                         format!("Current constellation: {}", self.input_constellation)
                     }
-                }),
-                slider(
+                }))
+                .padding(5),
+                container(slider(
                     -1..=6,
                     self.input_constellation,
                     Message::CurrentConstellationChanged
-                ),
-                text(format!("Current refinement: {}", self.input_refinement)),
-                slider(
+                ))
+                .padding(5),
+                container(text(format!(
+                    "Current refinement: {}",
+                    self.input_refinement
+                )))
+                .padding(5),
+                container(slider(
                     0..=5,
                     self.input_refinement,
                     Message::CurrentRefinementChanged
-                ),
-                text(match self.wanted_constellation {
+                ))
+                .padding(5),
+                container(text(match self.wanted_constellation {
                     -1 => "Wanted constellation: None".to_string(),
                     _ => {
                         format!("Wanted constellation: {}", self.wanted_constellation)
                     }
-                }),
-                slider(
+                }))
+                .padding(5),
+                container(slider(
                     -1..=6,
                     self.wanted_constellation,
                     Message::WantedConstellationChanged
-                ),
-                text(format!("Wanted refinement: {}", self.wanted_refinement)),
-                slider(
+                ))
+                .padding(5),
+                container(text(format!(
+                    "Wanted refinement: {}",
+                    self.wanted_refinement
+                )))
+                .padding(5),
+                container(slider(
                     0..=5,
                     self.wanted_refinement,
                     Message::WantedRefinementChanged
-                ),
+                ))
+                .padding(5),
             ));
 
-        let container_bottom: container::Container<'_, Message, Theme, Renderer> =
-            container(column!(
-                button("Submit").on_press(Message::Simulate),
+        let container_bottom: container::Container<'_, Message, Theme, Renderer> = container(row!(
+            container(button("Submit").on_press(Message::Simulate)).padding(5),
+            container(
                 text(format!(
                     "Estimated probability: {}",
                     self.estimated_probability
@@ -227,7 +259,9 @@ impl Sandbox for Index {
                     weight: font::Weight::Semibold,
                     ..Default::default()
                 })
-            ));
+            )
+            .padding(5)
+        ));
 
         let content = column!(
             container_title.padding(5),
