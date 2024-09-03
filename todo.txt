@@ -1,3 +1,4 @@
 - center quelques objets
 - window resize
 - text input en supplément
+- custom font
