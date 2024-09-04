@@ -7,6 +7,7 @@ use iced::{
 
 pub struct Index {
     input_pulls: u32,
+    cashback: bool,
     input_pity_character: usize,
     input_capture_radiance: u32,
     input_focus_character: bool,
@@ -24,6 +25,7 @@ impl Default for Index {
     fn default() -> Self {
         Self {
             input_pulls: 0,
+            cashback: false,
             input_pity_character: 0,
             input_capture_radiance: 1,
             input_focus_character: false,
@@ -42,6 +44,7 @@ impl Default for Index {
 #[derive(Debug, Clone)]
 pub enum Message {
     PullsChanged(u32),
+    PullsChangedCashback(bool),
     // Character
     PityCharacterChanged(u32),
     CaptureRadianceChanged(u32),
@@ -74,6 +77,13 @@ impl Sandbox for Index {
     fn update(&mut self, message: Self::Message) {
         match message {
             Message::PullsChanged(v) => self.input_pulls = v,
+            Message::PullsChangedCashback(v) => {
+                match v {
+                    true => self.input_pulls = (1.1 * self.input_pulls as f32) as u32,
+                    false => self.input_pulls = (self.input_pulls as f32 / 1.1) as u32,
+                };
+                self.cashback = v;
+            }
             // Character
             Message::PityCharacterChanged(v) => self.input_pity_character = v as usize,
             Message::CaptureRadianceChanged(v) => self.input_capture_radiance = v,
@@ -128,9 +138,16 @@ impl Sandbox for Index {
                 .height(Length::Fixed(60.0)),
         ));
 
-        let container_top: container::Container<'_, Message, Theme, Renderer> = container(column!(
-            container(text(format!("Available wishes: {}", self.input_pulls))).padding(5),
-            container(slider(0..=1000, self.input_pulls, Message::PullsChanged)).padding(5),
+        let container_top: container::Container<'_, Message, Theme, Renderer> = container(row!(
+            container(column!(
+                container(text(format!("Available wishes: {}", self.input_pulls))).padding(5),
+                container(slider(0..=1000, self.input_pulls, Message::PullsChanged)).padding(5),
+            )),
+            container(
+                checkbox("Include 10% cashback", self.cashback)
+                    .on_toggle(Message::PullsChangedCashback)
+            )
+            .padding(5),
         ));
 
         let container_left: container::Container<'_, Message, Theme, Renderer> =

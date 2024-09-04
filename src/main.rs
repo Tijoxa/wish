@@ -1,5 +1,4 @@
 #![windows_subsystem = "windows"]
-
 use iced::{
     window::{self, icon},
     Application, Settings, Size,
@@ -12,6 +11,7 @@ fn main() -> iced::Result {
     let settings = Settings {
         window: window::Settings {
             size: Size::new(800., 600.),
+            min_size: Some(Size::new(600., 600.)),
             icon: Some(icon),
             ..Default::default()
         },
