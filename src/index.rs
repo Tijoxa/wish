@@ -180,7 +180,7 @@ impl Sandbox for Index {
                 ))
                 .padding(5),
                 container(
-                    checkbox("Garanteed character", self.input_focus_character)
+                    checkbox("Guaranteed character", self.input_focus_character)
                         .on_toggle(Message::FocusCharacterChanged)
                 )
                 .padding(5),
