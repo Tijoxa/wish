@@ -1,3 +1,0 @@
-- center quelques objets
-- text input en supplément
-- custom font
