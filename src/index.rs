@@ -1,9 +1,5 @@
 use backend::simulate_n;
-use iced::{
-    alignment, font,
-    widget::{button, checkbox, column, container, row, slider, svg, text, text_input},
-    Element, Font, Length, Renderer, Sandbox, Theme,
-};
+use eframe::egui::{self, FontData, FontDefinitions, FontFamily};
 
 pub struct Index {
     input_pulls: u32,
@@ -63,6 +59,47 @@ pub enum Message {
     Simulate,
 }
 
+fn setup_custom_fonts(ctx: &egui::Context) {
+    let mut fonts = egui::FontDefinitions::default();
+    fonts.font_data.insert(
+        "gi_font".to_owned(),
+        egui::FontData::from_static(include_bytes!("../resources/zh-cn.ttf")),
+    );
+    fonts
+        .families
+        .entry(egui::FontFamily::Proportional)
+        .or_default()
+        .insert(0, "gi_font".to_owned());
+    fonts
+        .families
+        .entry(egui::FontFamily::Monospace)
+        .or_default()
+        .push("gi_font".to_owned());
+    ctx.set_fonts(fonts);
+}
+
+impl Index {
+    pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
+        setup_custom_fonts(&cc.egui_ctx);
+        Default::default()
+    }
+}
+
+impl eframe::App for Index {
+    fn save(&mut self, _storage: &mut dyn eframe::Storage) {}
+
+    fn update(&mut self, ctx: &eframe::egui::Context, frame: &mut eframe::Frame) {
+        egui::CentralPanel::default().show(ctx, |ui| {
+            ui.heading("Wish Planner");
+
+            // ui.add(
+            //     egui::Image::new(egui::include_image!("../resources/chiori_doll.png"))
+            //         .rounding(5.0),
+            // )
+        });
+    }
+}
+/*
 impl Sandbox for Index {
     type Message = Message;
 
@@ -294,3 +331,4 @@ impl Sandbox for Index {
         Theme::Dark
     }
 }
+*/

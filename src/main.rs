@@ -1,22 +1,26 @@
 #![windows_subsystem = "windows"]
-use iced::{
-    window::{self, icon, Position},
-    Application, Settings, Size,
-};
+use eframe::egui;
 use wish::index::Index;
 
-fn main() -> iced::Result {
-    let icon = icon::from_file_data(include_bytes!("../resources/intertwined_fate.png"), None)
-        .expect("Failed to create icon");
-    let settings = Settings {
-        window: window::Settings {
-            size: Size::new(800., 600.),
-            min_size: Some(Size::new(600., 600.)),
-            icon: Some(icon),
-            position: Position::Centered,
-            ..Default::default()
-        },
+fn main() -> eframe::Result {
+    env_logger::init();
+
+    let native_options = eframe::NativeOptions {
+        viewport: egui::ViewportBuilder::default()
+            .with_inner_size([800., 600.])
+            .with_min_inner_size([600., 600.])
+            .with_icon(
+                eframe::icon_data::from_png_bytes(
+                    &include_bytes!("../resources/intertwined_fate.png")[..],
+                )
+                .expect("Failed to load icon"),
+            )
+            .with_position([200., 50.]),
         ..Default::default()
     };
-    Index::run(settings)
+    eframe::run_native(
+        "Wish Planner",
+        native_options,
+        Box::new(|cc| Ok(Box::new(Index::new(cc)))),
+    )
 }
