@@ -141,104 +141,111 @@ impl eframe::App for Index {
                         }
                     });
 
-                    c[1].vertical_centered(|cc| {
-                        if cc
-                            .checkbox(&mut self.cashback, "Include 10% cashback")
-                            .changed()
-                        {
-                            match &self.cashback {
-                                true => self.input_pulls = (self.input_pulls as f64 * 1.1) as u32,
-                                false => self.input_pulls = (self.input_pulls as f64 / 1.1) as u32,
-                            }
+                    if c[1]
+                        .add_sized(
+                            [40., 40.],
+                            egui::Checkbox::new(&mut self.cashback, "Include 10% cashback"),
+                        )
+                        .changed()
+                    {
+                        match &self.cashback {
+                            true => self.input_pulls = (self.input_pulls as f64 * 1.1) as u32,
+                            false => self.input_pulls = (self.input_pulls as f64 / 1.1) as u32,
                         }
-                    });
+                    }
                 });
             });
             ui.add_space(20.);
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.columns(2, |c| {
-                // First column
-                // Character
-                c[0].add_space(10.);
-                c[0].vertical_centered(|cc| {
-                    cc.label("Character");
-                });
-                c[0].add_space(5.);
-                c[0].horizontal(|cc| {
-                    cc.label("Current character banner pity");
-                    cc.add(
-                        egui::DragValue::new(&mut self.input_pity_character)
-                            .range(0..=89)
-                            .speed(0.7)
-                            .prefix("Value: "),
-                    );
-                });
-                c[0].horizontal(|cc| {
-                    cc.label("Current capturing radiance");
-                    cc.add(egui::Slider::new(&mut self.input_capture_radiance, 1..=4));
-                });
-                c[0].horizontal(|cc| {
-                    cc.label("Guaranteed character");
-                    cc.checkbox(&mut self.input_focus_character, "");
-                });
-                // Weapon
-                c[0].add_space(10.);
-                c[0].vertical_centered(|cc| {
-                    cc.label("Weapon");
-                });
-                c[0].add_space(5.);
-                c[0].horizontal(|cc| {
-                    cc.label("Current weapon banner pity");
-                    cc.add(
-                        egui::DragValue::new(&mut self.input_pity_weapon)
-                            .range(0..=76)
-                            .speed(0.7)
-                            .prefix("Value: "),
-                    );
-                });
-                c[0].horizontal(|cc| {
-                    cc.label("Epitomized path");
-                    cc.checkbox(&mut self.input_epitomized_path, "");
-                });
-                c[0].horizontal(|cc| {
-                    cc.label("Guaranteed weapon");
-                    cc.checkbox(&mut self.input_focus_weapon, "");
-                });
-                // Second column
-                // Current
-                c[1].add_space(35.);
-                c[1].horizontal(|cc| {
-                    cc.columns(2, |ccc| {
-                        ccc[0].label("Current constellation");
-                        ccc[1].add(egui::Slider::new(&mut self.input_constellation, -1..=6));
-                    });
-                });
-                c[1].add_space(10.);
-                c[1].horizontal(|cc| {
-                    cc.columns(2, |ccc| {
-                        ccc[0].label("Current refinement");
-                        ccc[1].add(egui::Slider::new(&mut self.input_refinement, 0..=5));
-                    });
-                });
-                // Wanted
-                c[1].add_space(20.);
-                c[1].horizontal(|cc| {
-                    cc.columns(2, |ccc| {
-                        ccc[0].label("Wanted constellation");
-                        ccc[1].add(egui::Slider::new(&mut self.wanted_constellation, -1..=6));
-                    });
-                });
-                c[1].add_space(10.);
-                c[1].horizontal(|cc| {
-                    cc.columns(2, |ccc| {
-                        ccc[0].label("Wanted refinement");
-                        ccc[1].add(egui::Slider::new(&mut self.wanted_refinement, 0..=5));
+            ui.horizontal(|ui| {
+                ui.add_space(ctx.available_rect().width() * 0.5 - 370.);
+                ui.vertical(|ui| {
+                    ui.add_space(ctx.available_rect().height() * 0.5 - 170.);
+                    ui.columns(2, |c| {
+                        // First column
+                        // Character
+                        c[0].vertical_centered(|cc| {
+                            cc.label("Character");
+                        });
+                        c[0].add_space(5.);
+                        c[0].horizontal(|cc| {
+                            cc.label("Current character banner pity");
+                            cc.add(
+                                egui::DragValue::new(&mut self.input_pity_character)
+                                    .range(0..=89)
+                                    .speed(0.7)
+                                    .prefix("Value: "),
+                            );
+                        });
+                        c[0].horizontal(|cc| {
+                            cc.label("Current capturing radiance");
+                            cc.add(egui::Slider::new(&mut self.input_capture_radiance, 1..=4));
+                        });
+                        c[0].horizontal(|cc| {
+                            cc.label("Guaranteed character");
+                            cc.checkbox(&mut self.input_focus_character, "");
+                        });
+                        // Weapon
+                        c[0].add_space(10.);
+                        c[0].vertical_centered(|cc| {
+                            cc.label("Weapon");
+                        });
+                        c[0].add_space(5.);
+                        c[0].horizontal(|cc| {
+                            cc.label("Current weapon banner pity");
+                            cc.add(
+                                egui::DragValue::new(&mut self.input_pity_weapon)
+                                    .range(0..=76)
+                                    .speed(0.7)
+                                    .prefix("Value: "),
+                            );
+                        });
+                        c[0].horizontal(|cc| {
+                            cc.label("Epitomized path");
+                            cc.checkbox(&mut self.input_epitomized_path, "");
+                        });
+                        c[0].horizontal(|cc| {
+                            cc.label("Guaranteed weapon");
+                            cc.checkbox(&mut self.input_focus_weapon, "");
+                        });
+                        // Second column
+                        // Current
+                        c[1].add_space(30.);
+                        c[1].horizontal(|cc| {
+                            cc.columns(2, |ccc| {
+                                ccc[0].label("Current constellation");
+                                ccc[1]
+                                    .add(egui::Slider::new(&mut self.input_constellation, -1..=6));
+                            });
+                        });
+                        c[1].add_space(10.);
+                        c[1].horizontal(|cc| {
+                            cc.columns(2, |ccc| {
+                                ccc[0].label("Current refinement");
+                                ccc[1].add(egui::Slider::new(&mut self.input_refinement, 0..=5));
+                            });
+                        });
+                        // Wanted
+                        c[1].add_space(20.);
+                        c[1].horizontal(|cc| {
+                            cc.columns(2, |ccc| {
+                                ccc[0].label("Wanted constellation");
+                                ccc[1]
+                                    .add(egui::Slider::new(&mut self.wanted_constellation, -1..=6));
+                            });
+                        });
+                        c[1].add_space(10.);
+                        c[1].horizontal(|cc| {
+                            cc.columns(2, |ccc| {
+                                ccc[0].label("Wanted refinement");
+                                ccc[1].add(egui::Slider::new(&mut self.wanted_refinement, 0..=5));
+                            });
+                        });
                     });
                 });
             });
-            ui.add_space(20.);
         });
 
         egui::TopBottomPanel::bottom("simulation").show(ctx, |ui| {
