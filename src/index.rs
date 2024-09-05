@@ -81,6 +81,7 @@ fn setup_custom_fonts(ctx: &egui::Context) {
 impl Index {
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         setup_custom_fonts(&cc.egui_ctx);
+        egui_extras::install_image_loaders(&cc.egui_ctx);
         Default::default()
     }
 }
@@ -92,10 +93,9 @@ impl eframe::App for Index {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("Wish Planner");
 
-            // ui.add(
-            //     egui::Image::new(egui::include_image!("../resources/chiori_doll.png"))
-            //         .rounding(5.0),
-            // )
+            ui.add(egui::Image::new(egui::include_image!(
+                "../resources/chiori_doll.svg"
+            )))
         });
     }
 }
