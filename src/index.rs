@@ -14,7 +14,7 @@ pub struct Index {
     input_refinement: u32,
     wanted_constellation: i32,
     wanted_refinement: u32,
-    estimated_probability: f64,
+    estimated_probability: Option<f64>,
 }
 
 impl Default for Index {
@@ -32,7 +32,7 @@ impl Default for Index {
             input_refinement: 0,
             wanted_constellation: 0,
             wanted_refinement: 1,
-            estimated_probability: 0.0,
+            estimated_probability: None,
         }
     }
 }
@@ -97,64 +97,49 @@ impl eframe::App for Index {
                     c[0].vertical_centered(|cc| {
                         cc.add(egui::Image::new(image.clone()).fit_to_original_size(0.4));
                     });
-                    c[1].horizontal_centered(|cc| {
-                        cc.heading(egui::RichText::new("Wish Planner").size(32.0));
-                    });
+                    c[1].with_layout(
+                        egui::Layout::centered_and_justified(egui::Direction::LeftToRight),
+                        |cc| {
+                            cc.heading(egui::RichText::new("Wish Planner").size(32.0));
+                        },
+                    );
                     c[2].vertical_centered(|cc| {
                         cc.add(egui::Image::new(image).fit_to_original_size(0.4));
                     });
                 });
             });
         });
+
+        egui::TopBottomPanel::top("wishes").show(ctx, |ui| {
+            ui.label("Available wishes");
+            ui.label("Include 10% cashback");
+        });
+
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.columns(2, |c| {
-                c[0].vertical_centered(|cui| {
-                    cui.label("First column");
+                c[0].vertical_centered(|cc| {
+                    cc.label("Character");
                 });
-                c[1].label("Second column");
+                c[0].label("Current character banner pity");
+                c[0].label("Current capturing radiance");
+                c[0].label("Guaranteed character");
+                c[0].vertical_centered(|cc| {
+                    cc.label("Weapon");
+                });
+                c[0].label("Current weapon banner pity");
+                c[0].label("Epitomized path");
+                c[0].label("Guaranteed character");
+
+                c[1].label("Current constellation");
+                c[1].label("Current refinement");
+                c[1].label("Wanted constellation");
+                c[1].label("Wanted refinement");
             })
         });
-    }
-}
-/*
-impl Sandbox for Index {
-    type Message = Message;
 
-    fn new() -> Self {
-        Self::default()
-    }
-
-    fn title(&self) -> String {
-        String::from("Wish Planner")
-    }
-
-    fn update(&mut self, message: Self::Message) {
-        match message {
-            Message::PullsChanged(v) => self.input_pulls = v,
-            Message::PullsChangedCashback(v) => {
-                match v {
-                    true => self.input_pulls = (1.1 * self.input_pulls as f32) as u32,
-                    false => self.input_pulls = (self.input_pulls as f32 / 1.1) as u32,
-                };
-                self.cashback = v;
-            }
-            // Character
-            Message::PityCharacterChanged(v) => self.input_pity_character = v as usize,
-            Message::CaptureRadianceChanged(v) => self.input_capture_radiance = v,
-            Message::FocusCharacterChanged(v) => self.input_focus_character = v,
-            // Weapon
-            Message::PityWeaponChanged(v) => self.input_pity_weapon = v as usize,
-            Message::EpitomizedPathChanged(v) => self.input_epitomized_path = v,
-            Message::FocusWeaponChanged(v) => self.input_focus_weapon = v,
-            // Current
-            Message::CurrentConstellationChanged(v) => self.input_constellation = v,
-            Message::CurrentRefinementChanged(v) => self.input_refinement = v,
-            // Wanted
-            Message::WantedConstellationChanged(v) => self.wanted_constellation = v,
-            Message::WantedRefinementChanged(v) => self.wanted_refinement = v,
-            // Simulate
-            Message::Simulate => {
-                self.estimated_probability = simulate_n(
+        egui::TopBottomPanel::bottom("simulation").show(ctx, |ui| {
+            if ui.button("Submit").clicked() {
+                self.estimated_probability = Some(simulate_n(
                     self.input_pulls,
                     self.input_pity_character,
                     self.input_capture_radiance,
@@ -166,186 +151,12 @@ impl Sandbox for Index {
                     self.input_refinement,
                     self.wanted_constellation,
                     self.wanted_refinement,
-                );
-            }
-        }
-    }
-
-    fn view(&self) -> Element<Self::Message> {
-        let handle =
-            svg::Handle::from_memory(include_bytes!("../resources/chiori_doll.svg").as_slice());
-        let container_title: container::Container<'_, Message, Theme, Renderer> = container(row!(
-            svg(handle.clone())
-                .width(Length::Fixed(60.0))
-                .height(Length::Fixed(60.0)),
-            container(
-                text("Wish Planner")
-                    .font(Font {
-                        weight: font::Weight::ExtraBold,
-                        ..Default::default()
-                    })
-                    .size(40)
-            )
-            .padding(5),
-            svg(handle.clone())
-                .width(Length::Fixed(60.0))
-                .height(Length::Fixed(60.0)),
-        ));
-
-        let container_top: container::Container<'_, Message, Theme, Renderer> = container(row!(
-            container(column!(
-                container(text(format!("Available wishes: {}", self.input_pulls))).padding(5),
-                container(slider(0..=1000, self.input_pulls, Message::PullsChanged)).padding(5),
-            )),
-            container(
-                checkbox("Include 10% cashback", self.cashback)
-                    .on_toggle(Message::PullsChangedCashback)
-            )
-            .padding(5),
-        ));
-
-        let container_left: container::Container<'_, Message, Theme, Renderer> =
-            container(column!(
-                container(text("=== CHARACTER ===").font(Font {
-                    weight: font::Weight::Bold,
-                    ..Default::default()
-                }))
-                .padding(7),
-                container(text(format!(
-                    "Current character banner pity: {}",
-                    self.input_pity_character
-                )))
-                .padding(5),
-                container(slider(
-                    0..=89,
-                    self.input_pity_character as u32,
-                    Message::PityCharacterChanged
-                ))
-                .padding(5),
-                container(text(format!(
-                    "Current capturing radiance: {}",
-                    self.input_capture_radiance
-                )))
-                .padding(5),
-                container(slider(
-                    1..=4,
-                    self.input_capture_radiance,
-                    Message::CaptureRadianceChanged
-                ))
-                .padding(5),
-                container(
-                    checkbox("Guaranteed character", self.input_focus_character)
-                        .on_toggle(Message::FocusCharacterChanged)
-                )
-                .padding(5),
-                container(text("=== WEAPON ===").font(Font {
-                    weight: font::Weight::Bold,
-                    ..Default::default()
-                }))
-                .padding(7),
-                container(text(format!(
-                    "Current weapon banner pity: {}",
-                    self.input_pity_weapon
-                )))
-                .padding(5),
-                container(slider(
-                    0..=76,
-                    self.input_pity_weapon as u32,
-                    Message::PityWeaponChanged
-                ))
-                .padding(5),
-                container(
-                    checkbox("Epitomized path", self.input_epitomized_path)
-                        .on_toggle(Message::EpitomizedPathChanged)
-                )
-                .padding(5),
-                container(
-                    checkbox("Garanteed focus weapon", self.input_focus_weapon)
-                        .on_toggle(Message::FocusWeaponChanged)
-                )
-                .padding(5),
-            ));
-
-        let container_right: container::Container<'_, Message, Theme, Renderer> =
-            container(column!(
-                container(text(match self.input_constellation {
-                    -1 => "Current constellation: None".to_string(),
-                    _ => {
-                        format!("Current constellation: {}", self.input_constellation)
-                    }
-                }))
-                .padding(5),
-                container(slider(
-                    -1..=6,
-                    self.input_constellation,
-                    Message::CurrentConstellationChanged
-                ))
-                .padding(5),
-                container(text(format!(
-                    "Current refinement: {}",
-                    self.input_refinement
-                )))
-                .padding(5),
-                container(slider(
-                    0..=5,
-                    self.input_refinement,
-                    Message::CurrentRefinementChanged
-                ))
-                .padding(5),
-                container(text(match self.wanted_constellation {
-                    -1 => "Wanted constellation: None".to_string(),
-                    _ => {
-                        format!("Wanted constellation: {}", self.wanted_constellation)
-                    }
-                }))
-                .padding(5),
-                container(slider(
-                    -1..=6,
-                    self.wanted_constellation,
-                    Message::WantedConstellationChanged
-                ))
-                .padding(5),
-                container(text(format!(
-                    "Wanted refinement: {}",
-                    self.wanted_refinement
-                )))
-                .padding(5),
-                container(slider(
-                    0..=5,
-                    self.wanted_refinement,
-                    Message::WantedRefinementChanged
-                ))
-                .padding(5),
-            ));
-
-        let container_bottom: container::Container<'_, Message, Theme, Renderer> = container(row!(
-            container(button("Submit").on_press(Message::Simulate)).padding(5),
-            container(
-                text(format!(
-                    "Estimated probability: {}",
-                    self.estimated_probability
-                ))
-                .size(20)
-                .font(Font {
-                    weight: font::Weight::Semibold,
-                    ..Default::default()
-                })
-            )
-            .padding(5)
-        ));
-
-        let content = column!(
-            container_title.padding(5),
-            container_top.padding(5),
-            container(row!(container_left.padding(5), container_right.padding(5))),
-            container_bottom.padding(5)
-        );
-
-        container(content).padding(20).into()
-    }
-
-    fn theme(&self) -> Theme {
-        Theme::Dark
+                ));
+            };
+            ui.label(match self.estimated_probability {
+                Some(r) => format!("Probability: {}", r),
+                None => "Probability:".to_string(),
+            })
+        });
     }
 }
-*/
