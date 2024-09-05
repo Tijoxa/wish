@@ -89,7 +89,7 @@ impl Index {
 impl eframe::App for Index {
     fn save(&mut self, _storage: &mut dyn eframe::Storage) {}
 
-    fn update(&mut self, ctx: &eframe::egui::Context, frame: &mut eframe::Frame) {
+    fn update(&mut self, ctx: &eframe::egui::Context, _frame: &mut eframe::Frame) {
         egui::TopBottomPanel::top("title").show(ctx, |ui| {
             ui.vertical_centered(|ui| {
                 ui.columns(3, |c| {
@@ -111,52 +111,164 @@ impl eframe::App for Index {
         });
 
         egui::TopBottomPanel::top("wishes").show(ctx, |ui| {
-            ui.label("Available wishes");
-            ui.label("Include 10% cashback");
+            ui.add_space(20.);
+            ui.horizontal(|ui| {
+                ui.columns(2, |c| {
+                    c[0].horizontal(|cc| {
+                        cc.add_space(ctx.available_rect().width() * 0.1);
+                        if cc.add_sized([40., 40.], egui::Button::new("-10")).clicked() {
+                            self.input_pulls = (self.input_pulls - 10).max(0);
+                        }
+                        if cc.add_sized([30., 30.], egui::Button::new("-1")).clicked() {
+                            self.input_pulls = (self.input_pulls - 1).max(0);
+                        }
+                        cc.horizontal(|cc| {
+                            cc.set_width(160.);
+                            cc.vertical_centered(|cc| {
+                                cc.add(
+                                    egui::DragValue::new(&mut self.input_pulls)
+                                        .range(0..=9999)
+                                        .speed(0.7)
+                                        .prefix("Available wishes: "),
+                                );
+                            });
+                        });
+                        if cc.add_sized([30., 30.], egui::Button::new("+1")).clicked() {
+                            self.input_pulls = (self.input_pulls + 1).min(u32::MAX);
+                        }
+                        if cc.add_sized([40., 40.], egui::Button::new("+10")).clicked() {
+                            self.input_pulls = (self.input_pulls + 10).min(u32::MAX);
+                        }
+                    });
+
+                    c[1].vertical_centered(|cc| {
+                        if cc
+                            .checkbox(&mut self.cashback, "Include 10% cashback")
+                            .changed()
+                        {
+                            match &self.cashback {
+                                true => self.input_pulls = (self.input_pulls as f64 * 1.1) as u32,
+                                false => self.input_pulls = (self.input_pulls as f64 / 1.1) as u32,
+                            }
+                        }
+                    });
+                });
+            });
+            ui.add_space(20.);
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.columns(2, |c| {
+                // First column
+                // Character
+                c[0].add_space(10.);
                 c[0].vertical_centered(|cc| {
                     cc.label("Character");
                 });
-                c[0].label("Current character banner pity");
-                c[0].label("Current capturing radiance");
-                c[0].label("Guaranteed character");
+                c[0].add_space(5.);
+                c[0].horizontal(|cc| {
+                    cc.label("Current character banner pity");
+                    cc.add(
+                        egui::DragValue::new(&mut self.input_pity_character)
+                            .range(0..=89)
+                            .speed(0.7)
+                            .prefix("Value: "),
+                    );
+                });
+                c[0].horizontal(|cc| {
+                    cc.label("Current capturing radiance");
+                    cc.add(egui::Slider::new(&mut self.input_capture_radiance, 1..=4));
+                });
+                c[0].horizontal(|cc| {
+                    cc.label("Guaranteed character");
+                    cc.checkbox(&mut self.input_focus_character, "");
+                });
+                // Weapon
+                c[0].add_space(10.);
                 c[0].vertical_centered(|cc| {
                     cc.label("Weapon");
                 });
-                c[0].label("Current weapon banner pity");
-                c[0].label("Epitomized path");
-                c[0].label("Guaranteed character");
-
-                c[1].label("Current constellation");
-                c[1].label("Current refinement");
-                c[1].label("Wanted constellation");
-                c[1].label("Wanted refinement");
-            })
+                c[0].add_space(5.);
+                c[0].horizontal(|cc| {
+                    cc.label("Current weapon banner pity");
+                    cc.add(
+                        egui::DragValue::new(&mut self.input_pity_weapon)
+                            .range(0..=76)
+                            .speed(0.7)
+                            .prefix("Value: "),
+                    );
+                });
+                c[0].horizontal(|cc| {
+                    cc.label("Epitomized path");
+                    cc.checkbox(&mut self.input_epitomized_path, "");
+                });
+                c[0].horizontal(|cc| {
+                    cc.label("Guaranteed weapon");
+                    cc.checkbox(&mut self.input_focus_weapon, "");
+                });
+                // Second column
+                // Current
+                c[1].add_space(35.);
+                c[1].horizontal(|cc| {
+                    cc.columns(2, |ccc| {
+                        ccc[0].label("Current constellation");
+                        ccc[1].add(egui::Slider::new(&mut self.input_constellation, -1..=6));
+                    });
+                });
+                c[1].add_space(10.);
+                c[1].horizontal(|cc| {
+                    cc.columns(2, |ccc| {
+                        ccc[0].label("Current refinement");
+                        ccc[1].add(egui::Slider::new(&mut self.input_refinement, 0..=5));
+                    });
+                });
+                // Wanted
+                c[1].add_space(20.);
+                c[1].horizontal(|cc| {
+                    cc.columns(2, |ccc| {
+                        ccc[0].label("Wanted constellation");
+                        ccc[1].add(egui::Slider::new(&mut self.wanted_constellation, -1..=6));
+                    });
+                });
+                c[1].add_space(10.);
+                c[1].horizontal(|cc| {
+                    cc.columns(2, |ccc| {
+                        ccc[0].label("Wanted refinement");
+                        ccc[1].add(egui::Slider::new(&mut self.wanted_refinement, 0..=5));
+                    });
+                });
+            });
+            ui.add_space(20.);
         });
 
         egui::TopBottomPanel::bottom("simulation").show(ctx, |ui| {
-            if ui.button("Submit").clicked() {
-                self.estimated_probability = Some(simulate_n(
-                    self.input_pulls,
-                    self.input_pity_character,
-                    self.input_capture_radiance,
-                    self.input_focus_character,
-                    self.input_pity_weapon,
-                    self.input_epitomized_path,
-                    self.input_focus_weapon,
-                    self.input_constellation,
-                    self.input_refinement,
-                    self.wanted_constellation,
-                    self.wanted_refinement,
-                ));
-            };
-            ui.label(match self.estimated_probability {
-                Some(r) => format!("Probability: {}", r),
-                None => "Probability:".to_string(),
-            })
+            ui.vertical_centered(|ui| {
+                ui.add_space(20.);
+                if ui
+                    .add_sized([200., 50.], egui::Button::new("Submit"))
+                    .clicked()
+                {
+                    self.estimated_probability = Some(simulate_n(
+                        self.input_pulls,
+                        self.input_pity_character,
+                        self.input_capture_radiance,
+                        self.input_focus_character,
+                        self.input_pity_weapon,
+                        self.input_epitomized_path,
+                        self.input_focus_weapon,
+                        self.input_constellation,
+                        self.input_refinement,
+                        self.wanted_constellation,
+                        self.wanted_refinement,
+                    ));
+                };
+                ui.add_space(20.);
+                ui.label(match self.estimated_probability {
+                    Some(r) => format!("Probability: {:.2}%", 100. * r),
+                    None => "Probability: None".to_string(),
+                });
+                ui.add_space(20.);
+            });
         });
     }
 }
