@@ -1,5 +1,5 @@
 use backend::simulate_n;
-use eframe::egui::{self, FontData, FontDefinitions, FontFamily};
+use eframe::egui;
 
 pub struct Index {
     input_pulls: u32,
@@ -82,7 +82,7 @@ impl Index {
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         setup_custom_fonts(&cc.egui_ctx);
         egui_extras::install_image_loaders(&cc.egui_ctx);
-        Default::default()
+        Self::default()
     }
 }
 
@@ -90,12 +90,29 @@ impl eframe::App for Index {
     fn save(&mut self, _storage: &mut dyn eframe::Storage) {}
 
     fn update(&mut self, ctx: &eframe::egui::Context, frame: &mut eframe::Frame) {
+        egui::TopBottomPanel::top("title").show(ctx, |ui| {
+            ui.vertical_centered(|ui| {
+                ui.columns(3, |c| {
+                    let image = egui::include_image!("../resources/chiori_doll.svg");
+                    c[0].vertical_centered(|cc| {
+                        cc.add(egui::Image::new(image.clone()).fit_to_original_size(0.4));
+                    });
+                    c[1].horizontal_centered(|cc| {
+                        cc.heading(egui::RichText::new("Wish Planner").size(32.0));
+                    });
+                    c[2].vertical_centered(|cc| {
+                        cc.add(egui::Image::new(image).fit_to_original_size(0.4));
+                    });
+                });
+            });
+        });
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("Wish Planner");
-
-            ui.add(egui::Image::new(egui::include_image!(
-                "../resources/chiori_doll.svg"
-            )))
+            ui.columns(2, |c| {
+                c[0].vertical_centered(|cui| {
+                    cui.label("First column");
+                });
+                c[1].label("Second column");
+            })
         });
     }
 }
