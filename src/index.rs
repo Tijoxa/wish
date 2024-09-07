@@ -160,7 +160,7 @@ impl eframe::App for Index {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.horizontal(|ui| {
-                ui.add_space(ctx.available_rect().width() * 0.5 - 370.);
+                ui.add_space(ctx.available_rect().width() * 0.2 - 130.);
                 ui.vertical(|ui| {
                     ui.add_space(ctx.available_rect().height() * 0.5 - 170.);
                     ui.columns(2, |c| {
