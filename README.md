@@ -1,3 +1,10 @@
-[tutorial](https://leafheap.com/articles/iced-tutorial-version-0-12)
+# Wish Planner
+A wish simulator with a simple interface to compute probabilities of success.
 
-[svg embedded](https://stackoverflow.com/questions/76134971/svg-example-not-loading-the-svg-image-in-other-system-in-iced-library-for-rust)
+# Installation
+Just [download](https://github.com/Tijoxa/wish/releases) and run the latest `.exe` file. No installation required.
+
+To build from source, install [Rust](https://www.rust-lang.org/) then build the application in release mode:
+```Bash
+cargo build --release
+```
