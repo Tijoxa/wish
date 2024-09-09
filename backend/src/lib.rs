@@ -7,7 +7,7 @@ pub mod simulation;
 pub fn simulate_n(
     input_pulls: u32,
     input_pity_character: usize,
-    input_capture_radiance: u32,
+    input_capturing_radiance: u32,
     input_focus_character: bool,
     input_pity_weapon: usize,
     input_epitomized_path: bool,
@@ -24,7 +24,7 @@ pub fn simulate_n(
         let (pulls, constellation, refinement) = simulation::simulate(
             input_pulls,
             input_pity_character,
-            input_capture_radiance,
+            input_capturing_radiance,
             input_focus_character,
             input_pity_weapon,
             input_epitomized_path,
