@@ -21,7 +21,7 @@ pub fn simulate_n(
     let res = Arc::new(Mutex::new(0_f64));
 
     (0..nb_simulation).into_par_iter().for_each(|_| {
-        let (pulls, _, _) = simulation::simulate(
+        let (pulls, constellation, refinement) = simulation::simulate(
             input_pulls,
             input_pity_character,
             input_capture_radiance,
@@ -34,11 +34,11 @@ pub fn simulate_n(
             wanted_constellation,
             wanted_refinement,
         );
-        if pulls > 0 {
+        if pulls > 0 || (constellation == wanted_constellation && refinement == wanted_refinement) {
             let mut res_lock = res.lock().unwrap();
             *res_lock += 1.0;
         }
     });
-    let res = *res.lock().unwrap();
-    res / nb_simulation as f64
+    let res_lock = *res.lock().unwrap();
+    res_lock / nb_simulation as f64
 }

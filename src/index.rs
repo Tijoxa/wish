@@ -23,7 +23,7 @@ impl Default for Index {
             input_pulls: 0,
             cashback: false,
             input_pity_character: 0,
-            input_capture_radiance: 1,
+            input_capture_radiance: 0,
             input_focus_character: false,
             input_pity_weapon: 0,
             input_epitomized_path: false,
@@ -181,7 +181,7 @@ impl eframe::App for Index {
                         });
                         c[0].horizontal(|cc| {
                             cc.label("Current capturing radiance");
-                            cc.add(egui::Slider::new(&mut self.input_capture_radiance, 1..=4));
+                            cc.add(egui::Slider::new(&mut self.input_capture_radiance, 0..=3));
                         });
                         c[0].horizontal(|cc| {
                             cc.label("Guaranteed character");
