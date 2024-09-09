@@ -6,7 +6,7 @@ use crate::constant::{X, Y};
 pub fn simulate(
     input_pulls: u32,
     input_pity_character: usize,
-    input_capture_radiance: u32,
+    input_capturing_radiance: u32,
     input_focus_character: bool,
     input_pity_weapon: usize,
     input_epitomized_path: bool,
@@ -19,7 +19,7 @@ pub fn simulate(
     // one round of simulation
     let mut pulls = input_pulls;
     let mut pity_character = input_pity_character;
-    let mut capture_radiance = input_capture_radiance;
+    let mut capturing_radiance = input_capturing_radiance;
     let mut focus_character = input_focus_character;
     let mut pity_weapon = input_pity_weapon;
     let mut epitomized_path = input_epitomized_path;
@@ -30,7 +30,7 @@ pub fn simulate(
     let mut rng = thread_rng();
 
     while (pulls > 0) && (constellation < wanted_constellation || refinement < wanted_refinement) {
-        // simulate a session
+        // simulate a wish
         pulls -= 1;
 
         if constellation < wanted_constellation {
@@ -39,7 +39,7 @@ pub fn simulate(
                 &mut pity_character,
                 &mut focus_character,
                 &mut constellation,
-                &mut capture_radiance,
+                &mut capturing_radiance,
             );
         } else {
             pull_weapon(
@@ -60,7 +60,7 @@ fn pull_character(
     pity_character: &mut usize,
     focus_character: &mut bool,
     constellation: &mut i32,
-    capture_radiance: &mut u32,
+    capturing_radiance: &mut u32,
 ) {
     let rand: f64 = rng.gen();
 
@@ -71,33 +71,49 @@ fn pull_character(
         if *focus_character {
             *constellation += 1;
             *focus_character = false;
-        } else if *capture_radiance <= 2 {
+        } else if *capturing_radiance == 0 {
+            // no capturing radiance
             let randbool: bool = rng.gen();
 
             if randbool {
                 // lose
                 *focus_character = true;
-                *capture_radiance += 1;
+                *capturing_radiance += 1;
             } else {
                 *focus_character = false;
-                *capture_radiance = 1;
+                *capturing_radiance = 0;
                 *constellation += 1;
             }
-        } else if *capture_radiance == 3 {
+        } else if *capturing_radiance == 1 {
+            // very small chance of proc capturing radiance
+            let inner_rand: f64 = rng.gen();
+
+            if inner_rand < 0.4995 {
+                // lose
+                *focus_character = true;
+                *capturing_radiance += 1;
+            } else {
+                *focus_character = false;
+                *capturing_radiance = 0;
+                *constellation += 1;
+            }
+        } else if *capturing_radiance == 2 {
+            // it's a 75/25
             let randrange = rng.gen_range(0..=3);
 
             if randrange == 0 {
                 // lose
                 *focus_character = true;
-                *capture_radiance += 1;
+                *capturing_radiance += 1;
             } else {
                 *focus_character = false;
-                *capture_radiance = 1;
+                *capturing_radiance = 0;
                 *constellation += 1;
             }
         } else {
+            // it's guaranteed
             *focus_character = false;
-            *capture_radiance = 1;
+            *capturing_radiance = 0;
             *constellation += 1;
         }
     } else {

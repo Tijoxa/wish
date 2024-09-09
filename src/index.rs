@@ -5,7 +5,7 @@ pub struct Index {
     input_pulls: u32,
     cashback: bool,
     input_pity_character: usize,
-    input_capture_radiance: u32,
+    input_capturing_radiance: u32,
     input_focus_character: bool,
     input_pity_weapon: usize,
     input_epitomized_path: bool,
@@ -23,7 +23,7 @@ impl Default for Index {
             input_pulls: 0,
             cashback: false,
             input_pity_character: 0,
-            input_capture_radiance: 1,
+            input_capturing_radiance: 0,
             input_focus_character: false,
             input_pity_weapon: 0,
             input_epitomized_path: false,
@@ -43,7 +43,7 @@ pub enum Message {
     PullsChangedCashback(bool),
     // Character
     PityCharacterChanged(u32),
-    CaptureRadianceChanged(u32),
+    CapturingRadianceChanged(u32),
     FocusCharacterChanged(bool),
     // Weapon
     PityWeaponChanged(u32),
@@ -181,7 +181,7 @@ impl eframe::App for Index {
                         });
                         c[0].horizontal(|cc| {
                             cc.label("Current capturing radiance");
-                            cc.add(egui::Slider::new(&mut self.input_capture_radiance, 1..=4));
+                            cc.add(egui::Slider::new(&mut self.input_capturing_radiance, 0..=3));
                         });
                         c[0].horizontal(|cc| {
                             cc.label("Guaranteed character");
@@ -258,7 +258,7 @@ impl eframe::App for Index {
                     self.estimated_probability = Some(simulate_n(
                         self.input_pulls,
                         self.input_pity_character,
-                        self.input_capture_radiance,
+                        self.input_capturing_radiance,
                         self.input_focus_character,
                         self.input_pity_weapon,
                         self.input_epitomized_path,
