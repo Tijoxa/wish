@@ -141,18 +141,21 @@ impl eframe::App for Index {
                         }
                     });
 
-                    if c[1]
-                        .add_sized(
-                            [40., 40.],
-                            egui::Checkbox::new(&mut self.cashback, "Include 10% cashback"),
-                        )
-                        .changed()
-                    {
-                        match &self.cashback {
-                            true => self.input_pulls = (self.input_pulls as f64 * 1.1) as u32,
-                            false => self.input_pulls = (self.input_pulls as f64 / 1.1) as u32,
+                    c[1].horizontal(|cc| {
+                        cc.add_space(ctx.available_rect().width() * 0.2 - 60.);
+                        if cc
+                            .add_sized(
+                                [40., 40.],
+                                egui::Checkbox::new(&mut self.cashback, "Include 10% cashback"),
+                            )
+                            .changed()
+                        {
+                            match &self.cashback {
+                                true => self.input_pulls = (self.input_pulls as f64 * 1.1) as u32,
+                                false => self.input_pulls = (self.input_pulls as f64 / 1.1) as u32,
+                            }
                         }
-                    }
+                    });
                 });
             });
             ui.add_space(20.);
