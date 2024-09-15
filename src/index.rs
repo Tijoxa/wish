@@ -142,7 +142,7 @@ impl eframe::App for Index {
                     });
 
                     c[1].horizontal(|cc| {
-                        cc.add_space(ctx.available_rect().width() * 0.2 - 60.);
+                        cc.add_space(ctx.available_rect().width() * 0.15 - 10.);
                         if cc
                             .add_sized(
                                 [40., 40.],
