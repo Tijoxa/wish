@@ -10,3 +10,14 @@ To build from source, install [Rust](https://www.rust-lang.org/) then build the 
 ```Bash
 cargo build --release
 ```
+
+# Web
+## Wasm
+Install wasm-pack: `cargo install wasm-pack`
+
+`wasm-pack build --target web`
+
+## Server
+`bun install -g http-server`
+
+`http-server -c-1`

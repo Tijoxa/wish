@@ -1,7 +1,8 @@
-#![windows_subsystem = "windows"]
+#![cfg_attr(not(target_arch = "wasm32"), windows_subsystem = "windows")]
 use eframe::egui;
 use wish::index::Index;
 
+#[cfg(not(target_arch = "wasm32"))]
 fn main() -> eframe::Result {
     env_logger::init();
 
@@ -23,4 +24,9 @@ fn main() -> eframe::Result {
         native_options,
         Box::new(|cc| Ok(Box::new(Index::new(cc)))),
     )
+}
+
+#[cfg(target_arch = "wasm32")]
+fn main() -> eframe::Result {
+    Ok(())
 }
