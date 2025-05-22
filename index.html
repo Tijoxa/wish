@@ -1,24 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" />
-    <title>Wish Planner</title>
-  </head>
-  <body>
-    <canvas id="canvas" width="800" height="600"></canvas>
 
-    <script type="module">
-      import init, { WebHandle } from "./pkg/wish.js";
-      async function run() {
-        await init();
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" />
+  <title>Wish Planner</title>
+  <style>
+    body,
+    html {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-        const handle = new WebHandle();
-        const canvas = document.getElementById("canvas");
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
 
-        await handle.start(canvas);
-      }
-      run().catch(console.error);
-    </script>
-  </body>
+<body>
+  <canvas id="canvas"
+          width="800"
+          height="600"></canvas>
+
+  <script type="module">
+    import init, { WebHandle } from "./pkg/wish.js";
+    async function run() {
+      await init();
+
+      const handle = new WebHandle();
+      const canvas = document.getElementById("canvas");
+
+      await handle.start(canvas);
+    }
+    run().catch(console.error);
+  </script>
+</body>
+
 </html>

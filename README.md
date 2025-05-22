@@ -13,11 +13,9 @@ cargo build --release
 
 # Web
 ## Wasm
-Install wasm-pack: `cargo install wasm-pack`
+setup wasm-pack: https://rustwasm.github.io/docs/wasm-pack/introduction.html
 
-`wasm-pack build --target web`
-
-## Server
-`bun install -g http-server`
-
-`http-server -c-1`
+for local, run
+```Bash
+wasm-pack build --release --target web --no-pack; uv run python -m http.server --bind 127.0.0.1 8000
+```
