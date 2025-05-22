@@ -71,24 +71,11 @@ fn pull_character(
         if *focus_character {
             *constellation += 1;
             *focus_character = false;
-        } else if *capturing_radiance == 0 {
+        } else if *capturing_radiance <= 1 {
             // no capturing radiance
             let randbool: bool = rng.gen();
 
             if randbool {
-                // lose
-                *focus_character = true;
-                *capturing_radiance += 1;
-            } else {
-                *focus_character = false;
-                *capturing_radiance = 0;
-                *constellation += 1;
-            }
-        } else if *capturing_radiance == 1 {
-            // very small chance of proc capturing radiance
-            let inner_rand: f64 = rng.gen();
-
-            if inner_rand < 0.4995 {
                 // lose
                 *focus_character = true;
                 *capturing_radiance += 1;
