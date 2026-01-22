@@ -21,7 +21,7 @@ impl Default for Index {
     fn default() -> Self {
         Self {
             input_pulls: 0,
-            cashback: false,
+            cashback: true,
             input_pity_character: 0,
             input_capturing_radiance: 0,
             input_focus_character: false,
@@ -143,18 +143,10 @@ impl eframe::App for Index {
 
                     c[1].horizontal(|cc| {
                         cc.add_space(ctx.available_rect().width() * 0.15 - 10.);
-                        if cc
-                            .add_sized(
-                                [40., 40.],
-                                egui::Checkbox::new(&mut self.cashback, "Include 10% cashback"),
-                            )
-                            .changed()
-                        {
-                            match &self.cashback {
-                                true => self.input_pulls = (self.input_pulls as f64 * 1.1) as u32,
-                                false => self.input_pulls = (self.input_pulls as f64 / 1.1) as u32,
-                            }
-                        }
+                        cc.add_sized(
+                            [40., 40.],
+                            egui::Checkbox::new(&mut self.cashback, "Include 10% cashback"),
+                        );
                     });
                 });
             });
@@ -258,6 +250,10 @@ impl eframe::App for Index {
                     .add_sized([200., 50.], egui::Button::new("Submit"))
                     .clicked()
                 {
+                    match &self.cashback {
+                        true => self.input_pulls = (self.input_pulls as f64 * 1.1) as u32,
+                        false => (),
+                    };
                     self.estimated_probability = Some(simulate_n(
                         self.input_pulls,
                         self.input_pity_character,
@@ -275,7 +271,7 @@ impl eframe::App for Index {
                 ui.add_space(20.);
                 ui.label(match self.estimated_probability {
                     Some(r) => format!("Probability: {:.2}%", 100. * r),
-                    None => "Probability: None".to_string(),
+                    None => format!("Probability: None"),
                 });
                 ui.add_space(20.);
             });
