@@ -85,22 +85,22 @@ fn pull_character(
                 *constellation += 1;
             }
         } else if *capturing_radiance == 2 {
-            // it's a 75/25
-            let randrange = rng.gen_range(0..=3);
+            // it's a 95/5
+            let randrange = rng.gen_range(0..=19);
 
-            if randrange == 0 {
+            if randrange > 0 {
                 // lose
                 *focus_character = true;
-                *capturing_radiance += 1;
+                *capturing_radiance = 3;
             } else {
                 *focus_character = false;
-                *capturing_radiance = 0;
+                *capturing_radiance = 1;
                 *constellation += 1;
             }
         } else {
             // it's guaranteed
             *focus_character = false;
-            *capturing_radiance = 0;
+            *capturing_radiance = 1;
             *constellation += 1;
         }
     } else {
