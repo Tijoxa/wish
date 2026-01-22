@@ -10,7 +10,6 @@ jobs:
 
     permissions:
       contents: write
-      pull-requests: write
 
     steps:
       - name: Checkout repository
@@ -33,23 +32,8 @@ jobs:
           echo "REPO_VERSION=$REPO_VERSION" >> $GITHUB_ENV
 
       - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ env.REPO_VERSION }}
-          release_name: Wish Planner
+          name: Wish Planner
           body: "Plan your wishes ahead!"
-          draft: false
-          prerelease: false
-
-      - name: Upload release asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/release/wish.exe
-          asset_name: wish.exe
-          asset_content_type: application/octet-stream
