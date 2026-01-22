@@ -37,3 +37,4 @@ jobs:
           tag_name: v${{ env.REPO_VERSION }}
           name: Wish Planner
           body: "Plan your wishes ahead!"
+          files: ./target/release/wish.exe
