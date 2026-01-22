@@ -250,12 +250,8 @@ impl eframe::App for Index {
                     .add_sized([200., 50.], egui::Button::new("Submit"))
                     .clicked()
                 {
-                    match &self.cashback {
-                        true => self.input_pulls = (self.input_pulls as f64 * 1.1) as u32,
-                        false => (),
-                    };
                     self.estimated_probability = Some(simulate_n(
-                        self.input_pulls,
+                        self.input_pulls * if self.cashback { 11 } else { 10 } / 10,
                         self.input_pity_character,
                         self.input_capturing_radiance,
                         self.input_focus_character,
