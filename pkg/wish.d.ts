@@ -23,13 +23,6 @@ export enum ChromaSampling {
 }
 export class WebHandle {
   free(): void;
-  constructor();
-  /**
-   * @param {HTMLCanvasElement} canvas
-   * @returns {Promise<void>}
-   */
-  start(canvas: HTMLCanvasElement): Promise<void>;
-  destroy(): void;
   /**
    * @returns {boolean}
    */
@@ -42,6 +35,13 @@ export class WebHandle {
    * @returns {string | undefined}
    */
   panic_callstack(): string | undefined;
+  constructor();
+  /**
+   * @param {HTMLCanvasElement} canvas
+   * @returns {Promise<void>}
+   */
+  start(canvas: HTMLCanvasElement): Promise<void>;
+  destroy(): void;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -49,24 +49,24 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly __wbg_webhandle_free: (a: number, b: number) => void;
-  readonly webhandle_new: () => number;
-  readonly webhandle_start: (a: number, b: number) => number;
   readonly webhandle_destroy: (a: number) => void;
   readonly webhandle_has_panicked: (a: number) => number;
-  readonly webhandle_panic_message: (a: number) => Array;
+  readonly webhandle_new: () => number;
   readonly webhandle_panic_callstack: (a: number) => Array;
+  readonly webhandle_panic_message: (a: number) => Array;
+  readonly webhandle_start: (a: number, b: number) => number;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_export_2: WebAssembly.Table;
   readonly __wbindgen_export_3: WebAssembly.Table;
-  readonly closure1142_externref_shim: (a: number, b: number, c: number) => void;
-  readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h9dd58cbcba4d2cdd_multivalue_shim: (a: number, b: number) => Array;
+  readonly closure1146_externref_shim: (a: number, b: number, c: number) => void;
+  readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__had1c479c4aa8aa1f_multivalue_shim: (a: number, b: number) => Array;
   readonly __externref_table_dealloc: (a: number) => void;
-  readonly closure1179_externref_shim: (a: number, b: number, c: number) => void;
+  readonly closure1163_externref_shim: (a: number, b: number, c: number) => void;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __externref_table_alloc: () => number;
   readonly __wbindgen_exn_store: (a: number) => void;
-  readonly closure1506_externref_shim: (a: number, b: number, c: number, d: number) => void;
+  readonly closure1502_externref_shim: (a: number, b: number, c: number, d: number) => void;
   readonly __wbindgen_start: () => void;
 }
 
