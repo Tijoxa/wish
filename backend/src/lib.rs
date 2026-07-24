@@ -1,5 +1,9 @@
+#[cfg(not(target_arch = "wasm32"))]
 use rayon::prelude::*;
+#[cfg(not(target_arch = "wasm32"))]
 use std::sync::{Arc, Mutex};
+use rand::rngs::SmallRng;
+use rand::SeedableRng;
 
 pub mod constant;
 pub mod simulation;
@@ -18,27 +22,59 @@ pub fn simulate_n(
     wanted_refinement: u32,
 ) -> f64 {
     let nb_simulation = 1_000_000;
-    let res = Arc::new(Mutex::new(0_f64));
 
-    (0..nb_simulation).into_par_iter().for_each(|_| {
-        let (pulls, constellation, refinement) = simulation::simulate(
-            input_pulls,
-            input_pity_character,
-            input_capturing_radiance,
-            input_focus_character,
-            input_pity_weapon,
-            input_epitomized_path,
-            input_focus_weapon,
-            input_constellation,
-            input_refinement,
-            wanted_constellation,
-            wanted_refinement,
-        );
-        if pulls > 0 || (constellation == wanted_constellation && refinement == wanted_refinement) {
-            let mut res_lock = res.lock().unwrap();
-            *res_lock += 1.0;
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        let res = Arc::new(Mutex::new(0_f64));
+        (0..nb_simulation).into_par_iter().for_each(|_| {
+            let mut rng = SmallRng::from_entropy();
+            let (pulls, constellation, refinement) = simulation::simulate_with_rng(
+                &mut rng,
+                input_pulls,
+                input_pity_character,
+                input_capturing_radiance,
+                input_focus_character,
+                input_pity_weapon,
+                input_epitomized_path,
+                input_focus_weapon,
+                input_constellation,
+                input_refinement,
+                wanted_constellation,
+                wanted_refinement,
+            );
+            if pulls > 0 || (constellation == wanted_constellation && refinement == wanted_refinement) {
+                let mut res_lock = res.lock().unwrap();
+                *res_lock += 1.0;
+            }
+        });
+        let res_lock = *res.lock().unwrap();
+        res_lock / nb_simulation as f64
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    {
+        let mut rng = SmallRng::from_entropy();
+        let mut count = 0_f64;
+        for _ in 0..nb_simulation {
+            let (pulls, constellation, refinement) = simulation::simulate_with_rng(
+                &mut rng,
+                input_pulls,
+                input_pity_character,
+                input_capturing_radiance,
+                input_focus_character,
+                input_pity_weapon,
+                input_epitomized_path,
+                input_focus_weapon,
+                input_constellation,
+                input_refinement,
+                wanted_constellation,
+                wanted_refinement,
+            );
+            if pulls > 0 || (constellation == wanted_constellation && refinement == wanted_refinement) {
+                count += 1.0;
+            }
         }
-    });
-    let res_lock = *res.lock().unwrap();
-    res_lock / nb_simulation as f64
+        count / nb_simulation as f64
+    }
 }
+

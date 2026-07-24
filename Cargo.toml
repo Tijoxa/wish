@@ -5,13 +5,33 @@ edition = "2021"
 
 [dependencies]
 backend = { path = "./backend" }
-eframe = "0.28.1"
-egui_extras = { version = "0.28.1", features = ["all_loaders"] }
+eframe = { version = "0.29.1", features = ["wgpu", "ron", "serde"] }
+egui_extras = { version = "0.29.1", features = ["all_loaders"] }
+image = "0.25"
+getrandom = "0.2"
+resvg = "0.44"
+tiny-skia = "0.11"
+usvg = "0.44"
+log = "0.4.22"
+rand = { version = "0.8.5", features = ["small_rng"] }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 env_logger = "0.11.5"
-image = "0.25.2"
-resvg = "0.43.0"
-tiny-skia = "0.11.4"
-usvg = "0.43.0"
+
+[lib]
+name = "wish_lib"
+crate-type = ["cdylib", "rlib"]
+
+[lints.rust.unexpected_cfgs]
+level = "allow"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+egui-wgpu = "0.29.1"
+getrandom = { version = "0.2", features = ["js"] }
+wasm-bindgen = "0.2"
+web-sys = "0.3.72"
+wasm-bindgen-futures = "0.4"
+gloo-timers = { version = "0.3", features = ["futures"] }
 
 [build-dependencies]
 winresource = "0.1.17"
