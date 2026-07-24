@@ -136,10 +136,10 @@ impl eframe::App for Index {
                     c[0].horizontal(|cc| {
                         cc.add_space(ctx.available_rect().width() * 0.1);
                         if cc.add_sized([40., 40.], egui::Button::new("-10")).clicked() {
-                            self.input_pulls = (self.input_pulls - 10).max(0);
+                            self.input_pulls = self.input_pulls.saturating_sub(10);
                         }
                         if cc.add_sized([30., 30.], egui::Button::new("-1")).clicked() {
-                            self.input_pulls = (self.input_pulls - 1).max(0);
+                            self.input_pulls = self.input_pulls.saturating_sub(1);
                         }
                         cc.horizontal(|cc| {
                             cc.set_width(160.);
@@ -153,10 +153,10 @@ impl eframe::App for Index {
                             });
                         });
                         if cc.add_sized([30., 30.], egui::Button::new("+1")).clicked() {
-                            self.input_pulls = (self.input_pulls + 1).min(u32::MAX);
+                            self.input_pulls = self.input_pulls.saturating_add(1);
                         }
                         if cc.add_sized([40., 40.], egui::Button::new("+10")).clicked() {
-                            self.input_pulls = (self.input_pulls + 10).min(u32::MAX);
+                            self.input_pulls = self.input_pulls.saturating_add(10);
                         }
                     });
 
@@ -266,10 +266,13 @@ impl eframe::App for Index {
             ui.vertical_centered(|ui| {
                 ui.add_space(20.);
                 if self.is_simulating {
-                    ui.horizontal(|ui| {
-                        ui.add_space(ui.available_width() * 0.5 - 60.0);
-                        ui.add(egui::Spinner::new().size(24.0));
-                        ui.label("Simulating...");
+                    ui.add_sized([200., 50.], |ui: &mut egui::Ui| {
+                        ui.horizontal(|ui| {
+                            ui.add_space((ui.available_width() - 110.0).max(0.0) * 0.5);
+                            ui.add(egui::Spinner::new().size(24.0));
+                            ui.label("Simulating...");
+                        })
+                        .response
                     });
                 } else if ui
                     .add_sized([200., 50.], egui::Button::new("Submit"))
@@ -356,16 +359,14 @@ impl eframe::App for Index {
                             egui_ctx.request_repaint();
                         });
                     }
-
                 };
                 ui.add_space(20.);
                 ui.label(match self.estimated_probability {
                     Some(r) => format!("Probability: {:.2}%", 100. * r),
-                    None => format!("Probability: None"),
+                    None => "Probability: None".to_string(),
                 });
                 ui.add_space(20.);
             });
         });
     }
 }
-
