@@ -1424,6 +1424,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "futures-channel"
+version = "0.3.30"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eac8f7d7865dcb88bd4373ab671c8cf4508703796caa2b1985a9ca867b3fcb78"
+dependencies = [
+ "futures-core",
+]
+
+[[package]]
 name = "futures-core"
 version = "0.3.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1540,6 +1549,18 @@ dependencies = [
  "khronos_api",
  "log",
  "xml-rs",
+]
+
+[[package]]
+name = "gloo-timers"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbb143cf96099802033e0d4f4963b19fd2e0b728bcf076cd9cf7f6634f092994"
+dependencies = [
+ "futures-channel",
+ "futures-core",
+ "js-sys",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -4584,6 +4605,7 @@ dependencies = [
  "egui_extras",
  "env_logger",
  "getrandom",
+ "gloo-timers",
  "image",
  "log",
  "resvg 0.44.0",

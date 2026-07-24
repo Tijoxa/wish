@@ -33,6 +33,8 @@ getrandom = { version = "0.2", features = ["js"] }
 wasm-bindgen = "0.2"
 web-sys = "0.3.72"
 wasm-bindgen-futures = "0.4"
+gloo-timers = { version = "0.3", features = ["futures"] }
+
 
 [build-dependencies]
 winresource = "0.1.17"

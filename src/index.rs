@@ -1,5 +1,8 @@
+#[cfg(not(target_arch = "wasm32"))]
 use backend::simulate_n;
+
 use eframe::egui;
+use std::sync::mpsc::{channel, Receiver, Sender};
 
 pub struct Index {
     input_pulls: u32,
@@ -15,10 +18,14 @@ pub struct Index {
     wanted_constellation: i32,
     wanted_refinement: u32,
     estimated_probability: Option<f64>,
+    is_simulating: bool,
+    tx: Sender<f64>,
+    rx: Receiver<f64>,
 }
 
 impl Default for Index {
     fn default() -> Self {
+        let (tx, rx) = channel();
         Self {
             input_pulls: 0,
             cashback: true,
@@ -33,6 +40,9 @@ impl Default for Index {
             wanted_constellation: 0,
             wanted_refinement: 1,
             estimated_probability: None,
+            is_simulating: false,
+            tx,
+            rx,
         }
     }
 }
@@ -90,6 +100,15 @@ impl eframe::App for Index {
     fn save(&mut self, _storage: &mut dyn eframe::Storage) {}
 
     fn update(&mut self, ctx: &eframe::egui::Context, _frame: &mut eframe::Frame) {
+        if let Ok(prob) = self.rx.try_recv() {
+            self.estimated_probability = Some(prob);
+            self.is_simulating = false;
+        }
+
+        if self.is_simulating {
+            ctx.request_repaint();
+        }
+
         egui::TopBottomPanel::top("title").show(ctx, |ui| {
             ui.vertical_centered(|ui| {
                 ui.columns(3, |c| {
@@ -246,23 +265,92 @@ impl eframe::App for Index {
         egui::TopBottomPanel::bottom("simulation").show(ctx, |ui| {
             ui.vertical_centered(|ui| {
                 ui.add_space(20.);
-                if ui
+                if self.is_simulating {
+                    ui.horizontal(|ui| {
+                        ui.add_space(ui.available_width() * 0.5 - 60.0);
+                        ui.add(egui::Spinner::new().size(24.0));
+                        ui.label("Simulating...");
+                    });
+                } else if ui
                     .add_sized([200., 50.], egui::Button::new("Submit"))
                     .clicked()
                 {
-                    self.estimated_probability = Some(simulate_n(
-                        self.input_pulls * if self.cashback { 11 } else { 10 } / 10,
-                        self.input_pity_character,
-                        self.input_capturing_radiance,
-                        self.input_focus_character,
-                        self.input_pity_weapon,
-                        self.input_epitomized_path,
-                        self.input_focus_weapon,
-                        self.input_constellation,
-                        self.input_refinement,
-                        self.wanted_constellation,
-                        self.wanted_refinement,
-                    ));
+                    self.is_simulating = true;
+
+                    let tx = self.tx.clone();
+                    let egui_ctx = ctx.clone();
+
+                    let input_pulls = self.input_pulls * if self.cashback { 11 } else { 10 } / 10;
+                    let input_pity_character = self.input_pity_character;
+                    let input_capturing_radiance = self.input_capturing_radiance;
+                    let input_focus_character = self.input_focus_character;
+                    let input_pity_weapon = self.input_pity_weapon;
+                    let input_epitomized_path = self.input_epitomized_path;
+                    let input_focus_weapon = self.input_focus_weapon;
+                    let input_constellation = self.input_constellation;
+                    let input_refinement = self.input_refinement;
+                    let wanted_constellation = self.wanted_constellation;
+                    let wanted_refinement = self.wanted_refinement;
+
+                    #[cfg(not(target_arch = "wasm32"))]
+                    {
+                        std::thread::spawn(move || {
+                            let prob = simulate_n(
+                                input_pulls,
+                                input_pity_character,
+                                input_capturing_radiance,
+                                input_focus_character,
+                                input_pity_weapon,
+                                input_epitomized_path,
+                                input_focus_weapon,
+                                input_constellation,
+                                input_refinement,
+                                wanted_constellation,
+                                wanted_refinement,
+                            );
+                            tx.send(prob).ok();
+                            egui_ctx.request_repaint();
+                        });
+                    }
+
+                    #[cfg(target_arch = "wasm32")]
+                    {
+                        wasm_bindgen_futures::spawn_local(async move {
+                            let total_simulations = 1_000_000;
+                            let chunk_size = 50_000;
+                            let num_chunks = total_simulations / chunk_size;
+                            let mut count = 0_f64;
+
+                            for _ in 0..num_chunks {
+                                for _ in 0..chunk_size {
+                                    let (pulls, constellation, refinement) =
+                                        backend::simulation::simulate(
+                                            input_pulls,
+                                            input_pity_character,
+                                            input_capturing_radiance,
+                                            input_focus_character,
+                                            input_pity_weapon,
+                                            input_epitomized_path,
+                                            input_focus_weapon,
+                                            input_constellation,
+                                            input_refinement,
+                                            wanted_constellation,
+                                            wanted_refinement,
+                                        );
+                                    if pulls > 0
+                                        || (constellation == wanted_constellation
+                                            && refinement == wanted_refinement)
+                                    {
+                                        count += 1.0;
+                                    }
+                                }
+                                gloo_timers::future::TimeoutFuture::new(0).await;
+                            }
+                            let prob = count / total_simulations as f64;
+                            tx.send(prob).ok();
+                            egui_ctx.request_repaint();
+                        });
+                    }
                 };
                 ui.add_space(20.);
                 ui.label(match self.estimated_probability {
@@ -274,3 +362,4 @@ impl eframe::App for Index {
         });
     }
 }
+
