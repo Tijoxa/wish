@@ -1,4 +1,5 @@
 #![cfg_attr(not(target_arch = "wasm32"), windows_subsystem = "windows")]
+#[cfg(not(target_arch = "wasm32"))]
 use eframe::egui;
 use wish::index::Index;
 
@@ -27,6 +28,31 @@ fn main() -> eframe::Result {
 }
 
 #[cfg(target_arch = "wasm32")]
-fn main() -> eframe::Result {
-    Ok(())
+fn main() {
+    use eframe::wasm_bindgen::JsCast;
+
+    eframe::WebLogger::init(log::LevelFilter::Debug).ok();
+
+    let web_options = eframe::WebOptions::default();
+
+    wasm_bindgen_futures::spawn_local(async {
+        let document = web_sys::window().unwrap().document().unwrap();
+        let canvas = document
+            .get_element_by_id("canvas")
+            .unwrap()
+            .dyn_into::<web_sys::HtmlCanvasElement>()
+            .unwrap();
+
+        let start_result = eframe::WebRunner::new()
+            .start(
+                canvas,
+                web_options,
+                Box::new(|cc| Ok(Box::new(Index::new(cc)))),
+            )
+            .await;
+
+        if let Err(e) = start_result {
+            log::error!("Failed to start eframe: {e:?}");
+        }
+    });
 }

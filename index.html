@@ -3,60 +3,49 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wish Planner</title>
+
+    <link data-trunk rel="rust" data-wasm-opt="z" />
+    <link data-trunk rel="icon" href="favicon.ico" />
+    <link data-trunk rel="copy-file" href="sw.js" />
+    <link data-trunk rel="copy-dir" href="resources" />
+
     <style>
-        body,
-        html {
+        html,
+        body {
+            width: 100%;
             height: 100%;
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            padding: 0;
+            overflow: hidden;
+            background-color: #1b1b1b;
         }
 
-        canvas {
+        canvas#canvas {
+            width: 100%;
+            height: 100%;
             display: block;
         }
     </style>
 </head>
 
 <body>
-    <canvas id="canvas"
-            width="800"
-            height="600"></canvas>
+    <canvas id="canvas"></canvas>
 
     <script>
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
                 navigator.serviceWorker
-                    .register("/wish/sw.js")
+                    .register("./sw.js")
                     .then((registration) => {
-                        console.log(
-                            "ServiceWorker registration successful",
-                        );
+                        console.log("ServiceWorker registration successful");
                     })
                     .catch((error) => {
-                        console.error(
-                            "ServiceWorker registration failed:",
-                            error,
-                        );
+                        console.error("ServiceWorker registration failed:", error);
                     });
             });
         }
-    </script>
-
-    <script type="module">
-        import init, { WebHandle } from "./pkg/wish.js";
-        async function run() {
-            await init();
-
-            const handle = new WebHandle();
-            const canvas = document.getElementById("canvas");
-
-            await handle.start(canvas);
-        }
-        run().catch(console.error);
     </script>
 </body>
 
