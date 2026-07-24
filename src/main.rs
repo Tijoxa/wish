@@ -28,9 +28,7 @@ fn main() -> eframe::Result {
 }
 
 #[cfg(target_arch = "wasm32")]
-#[eframe::wasm_bindgen::prelude::wasm_bindgen(start)]
-pub fn main() {
-
+fn main() {
     use eframe::wasm_bindgen::JsCast;
 
     eframe::WebLogger::init(log::LevelFilter::Debug).ok();

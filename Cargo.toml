@@ -15,19 +15,14 @@ usvg = "0.44"
 log = "0.4.22"
 rand = { version = "0.8.5", features = ["small_rng"] }
 
-
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 env_logger = "0.11.5"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
-[[bin]]
-name = "wish"
-path = "src/main.rs"
-
-[lints.rust]
-unexpected_cfgs = { level = "allow", priority = 0 }
+[lints.rust.unexpected_cfgs]
+level = "allow"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 egui-wgpu = "0.29.1"
@@ -36,7 +31,6 @@ wasm-bindgen = "0.2"
 web-sys = "0.3.72"
 wasm-bindgen-futures = "0.4"
 gloo-timers = { version = "0.3", features = ["futures"] }
-
 
 [build-dependencies]
 winresource = "0.1.17"
