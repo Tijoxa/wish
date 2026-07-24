@@ -316,15 +316,20 @@ impl eframe::App for Index {
                     #[cfg(target_arch = "wasm32")]
                     {
                         wasm_bindgen_futures::spawn_local(async move {
+                            use rand::rngs::SmallRng;
+                            use rand::SeedableRng;
+
+                            let mut rng = SmallRng::from_entropy();
                             let total_simulations = 1_000_000;
-                            let chunk_size = 50_000;
+                            let chunk_size = 200_000;
                             let num_chunks = total_simulations / chunk_size;
                             let mut count = 0_f64;
 
                             for _ in 0..num_chunks {
                                 for _ in 0..chunk_size {
                                     let (pulls, constellation, refinement) =
-                                        backend::simulation::simulate(
+                                        backend::simulation::simulate_with_rng(
+                                            &mut rng,
                                             input_pulls,
                                             input_pity_character,
                                             input_capturing_radiance,
@@ -351,6 +356,7 @@ impl eframe::App for Index {
                             egui_ctx.request_repaint();
                         });
                     }
+
                 };
                 ui.add_space(20.);
                 ui.label(match self.estimated_probability {

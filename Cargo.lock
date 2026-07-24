@@ -4608,6 +4608,7 @@ dependencies = [
  "gloo-timers",
  "image",
  "log",
+ "rand",
  "resvg 0.44.0",
  "tiny-skia",
  "usvg 0.44.0",

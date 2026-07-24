@@ -1,9 +1,42 @@
 use rand::prelude::*;
+use rand::rngs::SmallRng;
 
 use crate::constant::{X, Y};
 
 #[allow(clippy::too_many_arguments)]
 pub fn simulate(
+    input_pulls: u32,
+    input_pity_character: usize,
+    input_capturing_radiance: u32,
+    input_focus_character: bool,
+    input_pity_weapon: usize,
+    input_epitomized_path: bool,
+    input_focus_weapon: bool,
+    input_constellation: i32,
+    input_refinement: u32,
+    wanted_constellation: i32,
+    wanted_refinement: u32,
+) -> (u32, i32, u32) {
+    let mut rng = SmallRng::from_entropy();
+    simulate_with_rng(
+        &mut rng,
+        input_pulls,
+        input_pity_character,
+        input_capturing_radiance,
+        input_focus_character,
+        input_pity_weapon,
+        input_epitomized_path,
+        input_focus_weapon,
+        input_constellation,
+        input_refinement,
+        wanted_constellation,
+        wanted_refinement,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn simulate_with_rng<R: Rng>(
+    rng: &mut R,
     input_pulls: u32,
     input_pity_character: usize,
     input_capturing_radiance: u32,
@@ -27,15 +60,13 @@ pub fn simulate(
     let mut constellation = input_constellation;
     let mut refinement = input_refinement;
 
-    let mut rng = thread_rng();
-
     while (pulls > 0) && (constellation < wanted_constellation || refinement < wanted_refinement) {
         // simulate a wish
         pulls -= 1;
 
         if constellation < wanted_constellation {
             pull_character(
-                &mut rng,
+                rng,
                 &mut pity_character,
                 &mut focus_character,
                 &mut constellation,
@@ -43,7 +74,7 @@ pub fn simulate(
             );
         } else {
             pull_weapon(
-                &mut rng,
+                rng,
                 &mut pity_weapon,
                 &mut epitomized_path,
                 &mut refinement,
@@ -55,8 +86,8 @@ pub fn simulate(
     (pulls, constellation, refinement)
 }
 
-fn pull_character(
-    rng: &mut ThreadRng,
+fn pull_character<R: Rng>(
+    rng: &mut R,
     pity_character: &mut usize,
     focus_character: &mut bool,
     constellation: &mut i32,
@@ -108,8 +139,8 @@ fn pull_character(
     }
 }
 
-fn pull_weapon(
-    rng: &mut ThreadRng,
+fn pull_weapon<R: Rng>(
+    rng: &mut R,
     pity_weapon: &mut usize,
     epitomized_path: &mut bool,
     refinement: &mut u32,
@@ -161,3 +192,4 @@ fn pull_weapon(
         *pity_weapon += 1;
     }
 }
+

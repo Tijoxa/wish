@@ -2,6 +2,8 @@
 use rayon::prelude::*;
 #[cfg(not(target_arch = "wasm32"))]
 use std::sync::{Arc, Mutex};
+use rand::rngs::SmallRng;
+use rand::SeedableRng;
 
 pub mod constant;
 pub mod simulation;
@@ -25,7 +27,9 @@ pub fn simulate_n(
     {
         let res = Arc::new(Mutex::new(0_f64));
         (0..nb_simulation).into_par_iter().for_each(|_| {
-            let (pulls, constellation, refinement) = simulation::simulate(
+            let mut rng = SmallRng::from_entropy();
+            let (pulls, constellation, refinement) = simulation::simulate_with_rng(
+                &mut rng,
                 input_pulls,
                 input_pity_character,
                 input_capturing_radiance,
@@ -49,9 +53,11 @@ pub fn simulate_n(
 
     #[cfg(target_arch = "wasm32")]
     {
+        let mut rng = SmallRng::from_entropy();
         let mut count = 0_f64;
         for _ in 0..nb_simulation {
-            let (pulls, constellation, refinement) = simulation::simulate(
+            let (pulls, constellation, refinement) = simulation::simulate_with_rng(
+                &mut rng,
                 input_pulls,
                 input_pity_character,
                 input_capturing_radiance,
@@ -71,3 +77,4 @@ pub fn simulate_n(
         count / nb_simulation as f64
     }
 }
+
