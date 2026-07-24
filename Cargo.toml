@@ -19,6 +19,7 @@ rand = { version = "0.8.5", features = ["small_rng"] }
 env_logger = "0.11.5"
 
 [lib]
+name = "wish_lib"
 crate-type = ["cdylib", "rlib"]
 
 [lints.rust.unexpected_cfgs]

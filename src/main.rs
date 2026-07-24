@@ -1,7 +1,7 @@
 #![cfg_attr(not(target_arch = "wasm32"), windows_subsystem = "windows")]
 #[cfg(not(target_arch = "wasm32"))]
 use eframe::egui;
-use wish::index::Index;
+use wish_lib::index::Index;
 
 #[cfg(not(target_arch = "wasm32"))]
 fn main() -> eframe::Result {
